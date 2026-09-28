@@ -24,14 +24,22 @@
             padding: 20px;
         }
 
-        /* Layout Griglia */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 16px;
+        /* Contenitore principale che tiene insieme i 3 gruppi */
+        .classroom {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 80px; /* Spazio ampio tra i tre gruppi */
             width: 100%;
-            max-width: 900px;
-            margin-bottom: 40px;
+            max-width: 1000px;
+            margin-bottom: 50px;
+        }
+
+        /* Ogni singolo gruppo (2 colonne) */
+        .group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Esattamente 2 colonne */
+            gap: 16px; /* Spazio tra i banchi dello stesso gruppo */
         }
 
         /* Stile dei Banchi */
@@ -43,7 +51,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            aspect-ratio: 1 / 1;
+            width: 80px; /* Larghezza fissa per mantenere la forma */
+            height: 80px; /* Altezza fissa per mantenere la forma */
             font-size: 1.5rem;
             font-weight: 600;
             color: #1a1a1a;
@@ -91,27 +100,34 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .grid-container {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
+        @media (max-width: 900px) {
+            .classroom {
+                gap: 40px; /* Riduci lo spazio tra i gruppi su schermi più piccoli */
             }
             .desk {
+                width: 70px;
+                height: 70px;
                 font-size: 1.25rem;
-                border-radius: 8px;
             }
         }
 
-        @media (max-width: 480px) {
-            .grid-container {
-                grid-template-columns: repeat(3, 1fr);
+        @media (max-width: 600px) {
+            .classroom {
+                flex-direction: column; /* Impila i gruppi verticalmente su mobile */
+                align-items: center;
+                gap: 30px;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="grid-container" id="grid"></div>
+    <!-- Contenitore dei 3 gruppi -->
+    <div class="classroom">
+        <div class="group" id="group-1"></div>
+        <div class="group" id="group-2"></div>
+        <div class="group" id="group-3"></div>
+    </div>
     
     <div class="controls">
         <button id="shuffleBtn">Genera</button>
@@ -121,13 +137,18 @@
         // Configurazione
         const TOTAL_SEATS = 24;
         const COOLDOWN_SECONDS = 5;
+        const SEATS_PER_GROUP = 8; // 24 posti / 3 gruppi = 8 posti per gruppo (2 colonne x 4 righe)
 
         // Stato
         let seats = Array.from({ length: TOTAL_SEATS }, (_, i) => i + 1);
         let isCooldown = false;
 
         // Elementi DOM
-        const gridElement = document.getElementById('grid');
+        const groupElements = [
+            document.getElementById('group-1'),
+            document.getElementById('group-2'),
+            document.getElementById('group-3')
+        ];
         const shuffleBtn = document.getElementById('shuffleBtn');
 
         // Funzione per mescolare l'array (Algoritmo Fisher-Yates)
@@ -139,15 +160,21 @@
             return array;
         }
 
-        // Funzione per renderizzare i banchi
+        // Funzione per renderizzare i banchi nei 3 gruppi
         function renderGrid() {
-            gridElement.innerHTML = '';
-            seats.forEach(number => {
+            // Svuota tutti i gruppi
+            groupElements.forEach(group => group.innerHTML = '');
+
+            // Distribuisci i 24 numeri nei 3 gruppi
+            for (let i = 0; i < TOTAL_SEATS; i++) {
                 const desk = document.createElement('div');
                 desk.classList.add('desk');
-                desk.textContent = number;
-                gridElement.appendChild(desk);
-            });
+                desk.textContent = seats[i];
+                
+                // Calcola a quale gruppo appartiene questo banco (0, 1 o 2)
+                const groupIndex = Math.floor(i / SEATS_PER_GROUP);
+                groupElements[groupIndex].appendChild(desk);
+            }
         }
 
         // Funzione di casualizzazione con timer

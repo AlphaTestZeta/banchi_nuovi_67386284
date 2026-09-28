@@ -24,18 +24,17 @@
             padding: 20px;
         }
 
-        /* Contenitore principale che tiene insieme i 3 gruppi */
+        /* Contenitore principale: 3 gruppi ben separati orizzontalmente */
         .classroom {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(3, auto); /* Tre colonne, una per gruppo */
+            gap: 120px; /* Spazio enorme per separare nettamente i tre gruppi */
             justify-content: center;
-            gap: 80px; /* Spazio ampio tra i tre gruppi */
+            margin-bottom: 60px;
             width: 100%;
-            max-width: 1000px;
-            margin-bottom: 50px;
         }
 
-        /* Ogni singolo gruppo (2 colonne) */
+        /* Ogni singolo gruppo (griglia da 2 colonne) */
         .group {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* Esattamente 2 colonne */
@@ -51,8 +50,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 80px; /* Larghezza fissa per mantenere la forma */
-            height: 80px; /* Altezza fissa per mantenere la forma */
+            width: 80px;  /* Larghezza fissa */
+            height: 80px; /* Altezza fissa per forma quadrata */
             font-size: 1.5rem;
             font-weight: 600;
             color: #1a1a1a;
@@ -99,30 +98,18 @@
             cursor: not-allowed;
         }
 
-        /* Responsive */
+        /* Responsive: su schermi piccoli i gruppi si impilano verticalmente per non rompersi */
         @media (max-width: 900px) {
             .classroom {
-                gap: 40px; /* Riduci lo spazio tra i gruppi su schermi più piccoli */
-            }
-            .desk {
-                width: 70px;
-                height: 70px;
-                font-size: 1.25rem;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .classroom {
-                flex-direction: column; /* Impila i gruppi verticalmente su mobile */
-                align-items: center;
-                gap: 30px;
+                grid-template-columns: 1fr; /* Impila i 3 gruppi */
+                gap: 50px; /* Spazio verticale tra i gruppi */
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Contenitore dei 3 gruppi -->
+    <!-- Contenitore dei 3 gruppi (come nel disegno) -->
     <div class="classroom">
         <div class="group" id="group-1"></div>
         <div class="group" id="group-2"></div>
@@ -165,7 +152,7 @@
             // Svuota tutti i gruppi
             groupElements.forEach(group => group.innerHTML = '');
 
-            // Distribuisci i 24 numeri nei 3 gruppi
+            // Distribuisci i 24 numeri nei 3 gruppi (8 numeri per gruppo)
             for (let i = 0; i < TOTAL_SEATS; i++) {
                 const desk = document.createElement('div');
                 desk.classList.add('desk');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generatore Posti</title>
+    <title>Generatore Posti - Vista Realistica</title>
     <style>
         /* Reset e Stili Base */
         * {
@@ -14,102 +14,186 @@
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
+            /* Pavimento realistico: effetto legno/linoleum */
+            background-color: #e8e4db;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            overflow-x: hidden;
         }
 
-        /* Contenitore principale: 3 gruppi ben separati orizzontalmente */
+        /* Effetto illuminazione dall'alto (Vignettatura) */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.15) 100%);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Contenitore principale: i 3 gruppi di banchi */
         .classroom {
-            display: grid;
-            grid-template-columns: repeat(3, auto); /* Tre colonne, una per gruppo */
-            gap: 120px; /* Spazio enorme per separare nettamente i tre gruppi */
+            display: flex;
             justify-content: center;
-            margin-bottom: 60px;
+            align-items: flex-start;
+            gap: 140px; /* Corridoio ampio tra i gruppi */
             width: 100%;
+            max-width: 1200px;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Ogni singolo gruppo (griglia da 2 colonne) */
+        /* Ogni singolo gruppo (2 colonne di banchi) */
         .group {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* Esattamente 2 colonne */
-            gap: 16px; /* Spazio tra i banchi dello stesso gruppo */
+            gap: 50px 30px; /* 50px di spazio verticale (per le sedie), 30px orizzontale */
         }
 
-        /* Stile dei Banchi */
-        .desk {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+        /* Contenitore del singolo banco + sedia */
+        .desk-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .desk-wrapper:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Piano del banco (Vista dall'alto) */
+        .table {
+            width: 100px;
+            height: 70px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            /* Ombra realistica per staccare il banco dal pavimento */
+            box-shadow: 
+                0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                inset 0 -4px 0 rgba(0,0,0,0.02);
+            position: relative;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 80px;  /* Larghezza fissa */
-            height: 80px; /* Altezza fissa per forma quadrata */
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            user-select: none;
         }
 
-        .desk:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        /* Etichetta col numero sul banco */
+        .number-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #f8f9fa;
+            color: #1f2937;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            letter-spacing: 0.5px;
+        }
+
+        /* Sedia (Vista dall'alto, infilata sotto il banco) */
+        .chair {
+            width: 60px;
+            height: 50px;
+            background: #374151; /* Grigio scuro moderno */
+            border-radius: 8px;
+            margin-top: -15px; /* Si infila sotto il banco */
+            z-index: 1;
+            position: relative;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Schienale della sedia (la parte posteriore) */
+        .chair::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 68px;
+            height: 12px;
+            background: #1f2937; /* Più scuro del sedile */
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         /* Stile del Pulsante */
         .controls {
-            display: flex;
-            justify-content: center;
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
         }
 
         button {
             background-color: #1a1a1a;
             color: #ffffff;
             border: none;
-            border-radius: 8px;
-            padding: 16px 32px;
-            font-size: 1rem;
-            font-weight: 500;
+            border-radius: 50px; /* Forma a pillola */
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
             user-select: none;
+            min-width: 140px;
+            text-align: center;
         }
 
         button:hover:not(:disabled) {
             background-color: #333333;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
         }
 
         button:active:not(:disabled) {
-            transform: scale(0.98);
+            transform: translateY(0) scale(0.98);
         }
 
         button:disabled {
-            background-color: #cccccc;
-            color: #888888;
+            background-color: #9ca3af;
+            color: #ffffff;
             cursor: not-allowed;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Responsive: su schermi piccoli i gruppi si impilano verticalmente per non rompersi */
-        @media (max-width: 900px) {
+        /* Responsive per iPad in verticale o schermi più piccoli */
+        @media (max-width: 1000px) {
             .classroom {
-                grid-template-columns: 1fr; /* Impila i 3 gruppi */
-                gap: 50px; /* Spazio verticale tra i gruppi */
+                flex-direction: column; /* Impila i 3 gruppi */
+                align-items: center;
+                gap: 80px; /* Spazio verticale tra i gruppi */
+            }
+            .group {
+                gap: 40px 30px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Contenitore dei 3 gruppi (come nel disegno) -->
+    <!-- Contenitore dei 3 gruppi -->
     <div class="classroom">
         <div class="group" id="group-1"></div>
         <div class="group" id="group-2"></div>
@@ -124,7 +208,7 @@
         // Configurazione
         const TOTAL_SEATS = 24;
         const COOLDOWN_SECONDS = 5;
-        const SEATS_PER_GROUP = 8; // 24 posti / 3 gruppi = 8 posti per gruppo (2 colonne x 4 righe)
+        const SEATS_PER_GROUP = 8; 
 
         // Stato
         let seats = Array.from({ length: TOTAL_SEATS }, (_, i) => i + 1);
@@ -147,20 +231,38 @@
             return array;
         }
 
-        // Funzione per renderizzare i banchi nei 3 gruppi
+        // Funzione per renderizzare i banchi realistici
         function renderGrid() {
             // Svuota tutti i gruppi
             groupElements.forEach(group => group.innerHTML = '');
 
-            // Distribuisci i 24 numeri nei 3 gruppi (8 numeri per gruppo)
+            // Distribuisci i 24 numeri nei 3 gruppi
             for (let i = 0; i < TOTAL_SEATS; i++) {
-                const desk = document.createElement('div');
-                desk.classList.add('desk');
-                desk.textContent = seats[i];
-                
-                // Calcola a quale gruppo appartiene questo banco (0, 1 o 2)
+                // Crea il wrapper del banco
+                const deskWrapper = document.createElement('div');
+                deskWrapper.classList.add('desk-wrapper');
+
+                // Crea il piano del banco
+                const table = document.createElement('div');
+                table.classList.add('table');
+
+                // Crea l'etichetta col numero
+                const numberTag = document.createElement('div');
+                numberTag.classList.add('number-tag');
+                numberTag.textContent = seats[i];
+
+                // Crea la sedia
+                const chair = document.createElement('div');
+                chair.classList.add('chair');
+
+                // Assembla il banco
+                table.appendChild(numberTag);
+                deskWrapper.appendChild(table);
+                deskWrapper.appendChild(chair);
+
+                // Calcola a quale gruppo appartiene (0, 1 o 2)
                 const groupIndex = Math.floor(i / SEATS_PER_GROUP);
-                groupElements[groupIndex].appendChild(desk);
+                groupElements[groupIndex].appendChild(deskWrapper);
             }
         }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generatore Posti - Vista Realistica</title>
+    <title>Generatore Posti - LIM Orizzontale Forzato</title>
     <style>
         /* Reset e Stili Base */
         * {
@@ -12,22 +12,22 @@
             padding: 0;
         }
 
-        body {
+        /* Permette lo scorrimento ORIZZONTALE su schermi piccoli, 
+           ma impedisce sempre quello verticale e l'impilamento */
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;  /* Fondamentale: permette lo scroll laterale invece di impilare */
+            overflow-y: hidden;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
             /* Pavimento realistico: effetto legno/linoleum */
             background-color: #e8e4db;
             background-image: 
                 linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
                 linear-gradient(0deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+            background-size: 3vw 3vw;
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-            overflow-x: hidden;
         }
 
         /* Effetto illuminazione dall'alto (Vignettatura) */
@@ -40,24 +40,38 @@
             z-index: 100;
         }
 
-        /* Contenitore principale: i 3 gruppi di banchi */
+        /* Contenitore principale dell'applicazione */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            padding: 2vh 4vw;
+        }
+
+        /* I 3 gruppi di banchi - FORZATI IN ORIZZONTALE */
         .classroom {
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            gap: 140px; /* Corridoio ampio tra i gruppi */
+            align-items: center;
+            /* Gap enorme e scalabile per separare i 3 blocchi */
+            gap: clamp(40px, 12vw, 300px); 
             width: 100%;
-            max-width: 1200px;
-            margin-bottom: 80px;
-            position: relative;
-            z-index: 10;
+            height: 100%;
+            max-height: 80vh;
+            /* Impedisce ai banchi di schiacciarsi su schermi piccoli, 
+               forzando lo scroll orizzontale sul body */
+            min-width: 900px; 
         }
 
-        /* Ogni singolo gruppo (2 colonne di banchi) */
+        /* Ogni singolo gruppo (2 colonne) */
         .group {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* Esattamente 2 colonne */
-            gap: 50px 30px; /* 50px di spazio verticale (per le sedie), 30px orizzontale */
+            /* Gap scalabile in base all'altezza e larghezza della LIM */
+            gap: clamp(20px, 4vh, 60px) clamp(15px, 3vw, 50px); 
         }
 
         /* Contenitore del singolo banco + sedia */
@@ -65,7 +79,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100px;
+            width: clamp(80px, 8vw, 180px); 
             position: relative;
             transition: transform 0.2s ease;
         }
@@ -76,16 +90,15 @@
 
         /* Piano del banco (Vista dall'alto) */
         .table {
-            width: 100px;
-            height: 70px;
+            width: 100%;
+            height: clamp(60px, 6vw, 120px);
             background: #ffffff;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
-            /* Ombra realistica per staccare il banco dal pavimento */
+            border-radius: 1vh;
             box-shadow: 
-                0 10px 15px -3px rgba(0, 0, 0, 0.1),
-                0 4px 6px -2px rgba(0, 0, 0, 0.05),
-                inset 0 -4px 0 rgba(0,0,0,0.02);
+                0 1.5vh 2vh -0.5vh rgba(0, 0, 0, 0.1),
+                0 0.5vh 1vh -0.2vh rgba(0, 0, 0, 0.05),
+                inset 0 -0.5vh 0 rgba(0,0,0,0.02);
             position: relative;
             z-index: 2;
             display: flex;
@@ -95,47 +108,44 @@
 
         /* Numero grande al centro del banco */
         .desk-number {
-            font-size: 1.8rem; /* Dimensione grande e leggibile */
+            font-size: clamp(2rem, 3vw, 4rem); 
             font-weight: 700;
             color: #1f2937;
             line-height: 1;
             user-select: none;
-            /* Leggera ombra per staccare il numero dal bianco */
-            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            text-shadow: 0 0.2vh 0.4vh rgba(0,0,0,0.05);
         }
 
         /* Sedia (Vista dall'alto, infilata sotto il banco) */
         .chair {
-            width: 60px;
-            height: 50px;
-            background: #374151; /* Grigio scuro moderno */
-            border-radius: 8px;
-            margin-top: -15px; /* Si infila sotto il banco */
+            width: 60%;
+            height: clamp(40px, 4vw, 80px);
+            background: #374151;
+            border-radius: 1vh;
+            margin-top: -2vh; 
             z-index: 1;
             position: relative;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 1vh 2vh rgba(0, 0, 0, 0.15);
         }
 
-        /* Schienale della sedia (la parte posteriore) */
+        /* Schienale della sedia */
         .chair::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 68px;
-            height: 12px;
-            background: #1f2937; /* Più scuro del sedile */
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            width: 110%;
+            height: 20%;
+            background: #1f2937;
+            border-radius: 0.5vh;
+            box-shadow: 0 0.4vh 0.8vh rgba(0,0,0,0.2);
         }
 
         /* Stile del Pulsante */
         .controls {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-top: auto; 
+            padding-bottom: 2vh;
             z-index: 200;
         }
 
@@ -143,23 +153,21 @@
             background-color: #1a1a1a;
             color: #ffffff;
             border: none;
-            border-radius: 50px; /* Forma a pillola */
-            padding: 18px 40px;
-            font-size: 1.1rem;
+            border-radius: 50px;
+            padding: 2vh 4vw; 
+            font-size: clamp(1rem, 1.5vw, 2rem);
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.1vw;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1vh 2vh rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease;
-            user-select: none;
-            min-width: 140px;
+            min-width: 150px;
             text-align: center;
         }
 
         button:hover:not(:disabled) {
             background-color: #333333;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            transform: translateY(-0.5vh);
         }
 
         button:active:not(:disabled) {
@@ -168,35 +176,23 @@
 
         button:disabled {
             background-color: #9ca3af;
-            color: #ffffff;
             cursor: not-allowed;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Responsive per iPad in verticale o schermi più piccoli */
-        @media (max-width: 1000px) {
-            .classroom {
-                flex-direction: column; /* Impila i 3 gruppi */
-                align-items: center;
-                gap: 80px; /* Spazio verticale tra i gruppi */
-            }
-            .group {
-                gap: 40px 30px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Contenitore dei 3 gruppi -->
-    <div class="classroom">
-        <div class="group" id="group-1"></div>
-        <div class="group" id="group-2"></div>
-        <div class="group" id="group-3"></div>
-    </div>
-    
-    <div class="controls">
-        <button id="shuffleBtn">Genera</button>
+    <div class="app-container">
+        <!-- Contenitore dei 3 gruppi: rimane SEMPRE orizzontale -->
+        <div class="classroom">
+            <div class="group" id="group-1"></div>
+            <div class="group" id="group-2"></div>
+            <div class="group" id="group-3"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="shuffleBtn">Genera</button>
+        </div>
     </div>
 
     <script>
@@ -233,20 +229,16 @@
 
             // Distribuisci i 24 numeri nei 3 gruppi
             for (let i = 0; i < TOTAL_SEATS; i++) {
-                // Crea il wrapper del banco
                 const deskWrapper = document.createElement('div');
                 deskWrapper.classList.add('desk-wrapper');
 
-                // Crea il piano del banco
                 const table = document.createElement('div');
                 table.classList.add('table');
 
-                // Crea il numero grande al centro
                 const deskNumber = document.createElement('div');
                 deskNumber.classList.add('desk-number');
                 deskNumber.textContent = seats[i];
 
-                // Crea la sedia
                 const chair = document.createElement('div');
                 chair.classList.add('chair');
 
@@ -265,11 +257,9 @@
         function handleShuffle() {
             if (isCooldown) return;
 
-            // Mescola e renderizza
             seats = shuffleArray(seats);
             renderGrid();
 
-            // Avvia il cooldown
             isCooldown = true;
             let timeLeft = COOLDOWN_SECONDS;
             
